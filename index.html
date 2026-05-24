@@ -5,26 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pomodoro Timer</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
-
   <style>
     :root {
-      --focus-primary: #ff6b35;
-      --focus-secondary: #ff9f1c;
-      --break-primary: #06d6a0;
-      --break-secondary: #0cb8e0;
+      --focus-primary: #22c55e;
+      --focus-secondary: #86efac;
+      --break-primary: #3b82f6;
+      --break-secondary: #93c5fd;
       --bg-deep: #050810;
       --bg-card: rgba(255,255,255,0.04);
       --glass-border: rgba(255,255,255,0.08);
       --text-primary: #f0f4ff;
       --text-muted: rgba(240,244,255,0.45);
-      --glow-focus: rgba(255,107,53,0.4);
-      --glow-break: rgba(6,214,160,0.4);
+      --glow-focus: rgba(34,197,94,0.45);
+      --glow-break: rgba(59,130,246,0.45);
       --ring-size: 260px;
     }
-
-    *, *::before, *::after {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
     body {
       font-family: 'Rajdhani', sans-serif;
@@ -39,946 +35,968 @@
       padding: 20px;
     }
 
-    /* ─── Animated BG ─── */
     body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
+      content:'';
+      position:fixed; inset:0;
       background:
-        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(255,107,53,0.08) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 80% at 80% 90%, rgba(6,214,160,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(34,197,94,0.07) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 80% at 80% 90%, rgba(59,130,246,0.07) 0%, transparent 60%),
         radial-gradient(ellipse 40% 40% at 50% 50%, rgba(11,20,50,0.95) 0%, transparent 100%);
-      pointer-events: none;
-      z-index: 0;
+      pointer-events:none; z-index:0;
     }
 
-    .particles {
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .particle {
-      position: absolute;
-      border-radius: 50%;
-      opacity: 0;
-      animation: floatUp linear infinite;
-    }
-
+    .particles { position:fixed; inset:0; pointer-events:none; z-index:0; overflow:hidden; }
+    .particle  { position:absolute; border-radius:50%; opacity:0; animation:floatUp linear infinite; }
     @keyframes floatUp {
-      0%   { opacity: 0; transform: translateY(0) scale(0.5); }
-      10%  { opacity: 0.6; }
-      90%  { opacity: 0.2; }
-      100% { opacity: 0; transform: translateY(-100vh) scale(1.2); }
+      0%   { opacity:0; transform:translateY(0) scale(0.5); }
+      10%  { opacity:0.6; }
+      90%  { opacity:0.2; }
+      100% { opacity:0; transform:translateY(-100vh) scale(1.2); }
     }
 
-    /* ─── Main Container ─── */
     .app {
-      position: relative;
-      z-index: 1;
-      width: 100%;
-      max-width: 500px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      position:relative; z-index:1;
+      width:100%; max-width:500px;
+      display:flex; flex-direction:column; gap:20px;
     }
 
-    /* ─── Header ─── */
-    .header {
-      text-align: center;
-      animation: slideDown 0.8s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-
+    /* ── Header ── */
+    .header { text-align:center; animation:slideDown 0.8s cubic-bezier(0.34,1.56,0.64,1) both; }
     @keyframes slideDown {
-      from { opacity: 0; transform: translateY(-30px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(-30px); }
+      to   { opacity:1; transform:translateY(0); }
     }
-
     .header h1 {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(22px, 5vw, 30px);
-      font-weight: 900;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      filter: drop-shadow(0 0 20px var(--glow-focus));
-      transition: all 0.8s ease;
+      font-family:'Orbitron', monospace;
+      font-size:clamp(22px,5vw,30px); font-weight:900;
+      letter-spacing:0.3em; text-transform:uppercase;
+      background:linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      filter:drop-shadow(0 0 20px var(--glow-focus)); transition:all 0.8s ease;
     }
-
     .header h1.break-mode {
-      background: linear-gradient(135deg, var(--break-primary), var(--break-secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      filter: drop-shadow(0 0 20px var(--glow-break));
+      background:linear-gradient(135deg, var(--break-primary), var(--break-secondary));
+      -webkit-background-clip:text; background-clip:text;
+      filter:drop-shadow(0 0 20px var(--glow-break));
     }
 
     .mode-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      padding: 6px 18px;
-      border-radius: 50px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      background: rgba(255,107,53,0.12);
-      border: 1px solid rgba(255,107,53,0.3);
-      color: var(--focus-primary);
-      transition: all 0.6s ease;
+      display:inline-flex; align-items:center; gap:8px;
+      margin-top:10px; padding:6px 18px; border-radius:50px;
+      font-size:13px; font-weight:600; letter-spacing:0.15em; text-transform:uppercase;
+      background:rgba(255,107,53,0.12); border:1px solid rgba(255,107,53,0.3);
+      color:var(--focus-primary); transition:all 0.6s ease;
     }
-
     .mode-badge.break-mode {
-      background: rgba(6,214,160,0.12);
-      border-color: rgba(6,214,160,0.3);
-      color: var(--break-primary);
+      background:rgba(6,214,160,0.12); border-color:rgba(6,214,160,0.3); color:var(--break-primary);
     }
-
     .mode-badge .dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: currentColor;
-      animation: pulse-dot 1.5s ease-in-out infinite;
+      width:7px; height:7px; border-radius:50%;
+      background:currentColor; animation:pulse-dot 1.5s ease-in-out infinite;
     }
-
     @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.6; }
+      0%,100% { transform:scale(1); opacity:1; }
+      50%      { transform:scale(1.5); opacity:0.6; }
     }
 
-    /* ─── Timer Ring Card ─── */
+    /* ── Turns banner ── */
+    .turns-banner {
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      margin-top:8px; font-size:14px; font-weight:600; letter-spacing:0.08em;
+      opacity:0; transition:opacity 0.4s;
+    }
+    .turns-banner.visible { opacity:1; }
+    .turns-left-num {
+      font-family:'Orbitron', monospace; font-size:22px; font-weight:900;
+      color:var(--focus-primary); transition:color 0.6s;
+    }
+    .turns-left-num.break-mode { color:var(--break-primary); }
+    .turns-left-label { color:var(--text-muted); font-size:12px; text-transform:uppercase; letter-spacing:0.15em; }
+
+    /* ── Timer Card ── */
     .timer-card {
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: 28px;
-      padding: 36px 24px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 30px;
-      backdrop-filter: blur(20px);
-      position: relative;
-      overflow: hidden;
-      animation: fadeUp 0.8s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
-      transition: box-shadow 0.8s ease;
+      background:var(--bg-card); border:1px solid var(--glass-border);
+      border-radius:28px; padding:36px 24px;
+      display:flex; flex-direction:column; align-items:center; gap:26px;
+      backdrop-filter:blur(20px); position:relative; overflow:hidden;
+      animation:fadeUp 0.8s 0.2s cubic-bezier(0.34,1.56,0.64,1) both;
+      transition:box-shadow 0.8s ease;
     }
-
-    .timer-card.focus-glow {
-      box-shadow: 0 0 60px rgba(255,107,53,0.12), 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-    }
-
-    .timer-card.break-glow {
-      box-shadow: 0 0 60px rgba(6,214,160,0.12), 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
-    }
-
+    .timer-card.focus-glow { box-shadow:0 0 60px rgba(34,197,94,0.12),  0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
+    .timer-card.break-glow { box-shadow:0 0 60px rgba(59,130,246,0.12), 0 30px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06); }
     .timer-card::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(255,107,53,0.06), transparent 70%);
-      pointer-events: none;
-      transition: background 0.8s ease;
+      content:''; position:absolute; top:-50%; left:-50%; width:200%; height:200%;
+      background:radial-gradient(ellipse 50% 40% at 50% 0%, rgba(34,197,94,0.06), transparent 70%);
+      pointer-events:none; transition:background 0.8s ease;
     }
-
-    .timer-card.break-mode::before {
-      background: radial-gradient(ellipse 50% 40% at 50% 0%, rgba(6,214,160,0.06), transparent 70%);
-    }
-
+    .timer-card.break-mode::before { background:radial-gradient(ellipse 50% 40% at 50% 0%, rgba(59,130,246,0.06), transparent 70%); }
     @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to   { opacity: 1; transform: translateY(0); }
+      from { opacity:0; transform:translateY(30px); }
+      to   { opacity:1; transform:translateY(0); }
     }
 
-    /* ─── SVG Ring ─── */
+    /* ── Ring ── */
     .ring-wrap {
-      position: relative;
-      width: var(--ring-size);
-      height: var(--ring-size);
-      filter: drop-shadow(0 0 30px var(--glow-focus));
-      transition: filter 0.8s ease;
+      position:relative; width:var(--ring-size); height:var(--ring-size);
+      filter:drop-shadow(0 0 30px var(--glow-focus)); transition:filter 0.8s ease;
     }
-
-    .ring-wrap.break-mode {
-      filter: drop-shadow(0 0 30px var(--glow-break));
-    }
-
-    .ring-wrap svg {
-      width: 100%;
-      height: 100%;
-      transform: rotate(-90deg);
-    }
-
-    .ring-track {
-      fill: none;
-      stroke: rgba(255,255,255,0.05);
-      stroke-width: 8;
-    }
-
+    .ring-wrap.break-mode { filter:drop-shadow(0 0 30px var(--glow-break)); }
+    .ring-wrap svg { width:100%; height:100%; transform:rotate(-90deg); }
+    .ring-track    { fill:none; stroke:rgba(255,255,255,0.05); stroke-width:8; }
     .ring-progress {
-      fill: none;
-      stroke-width: 8;
-      stroke-linecap: round;
-      stroke: url(#focusGrad);
-      stroke-dasharray: 754;
-      stroke-dashoffset: 0;
-      transition: stroke-dashoffset 1.05s linear, stroke 0.8s ease;
+      fill:none; stroke-width:8; stroke-linecap:round;
+      stroke:url(#focusGrad); stroke-dasharray:754; stroke-dashoffset:0;
+      transition:stroke-dashoffset 1.05s linear, stroke 0.8s ease;
     }
+    .ring-progress.break-mode { stroke:url(#breakGrad); }
 
-    .ring-progress.break-mode {
-      stroke: url(#breakGrad);
-    }
-
-    /* ─── Timer Digits ─── */
     .timer-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
+      position:absolute; inset:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
     }
-
     .timer-digits {
-      font-family: 'Orbitron', monospace;
-      font-size: clamp(48px, 12vw, 64px);
-      font-weight: 700;
-      letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #fff 30%, var(--focus-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      transition: all 0.6s ease;
-      line-height: 1;
+      font-family:'Orbitron', monospace;
+      font-size:clamp(48px,12vw,64px); font-weight:700; letter-spacing:0.05em;
+      background:linear-gradient(135deg, #fff 30%, var(--focus-secondary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      transition:all 0.6s ease; line-height:1;
     }
-
     .timer-digits.break-mode {
-      background: linear-gradient(135deg, #fff 30%, var(--break-secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
+      background:linear-gradient(135deg, #fff 30%, var(--break-secondary));
+      -webkit-background-clip:text; background-clip:text;
     }
-
-    .timer-digits.tick {
-      animation: tickPop 0.1s ease;
-    }
-
+    .timer-digits.tick { animation:tickPop 0.1s ease; }
     @keyframes tickPop {
-      0%   { transform: scale(1.04); }
-      100% { transform: scale(1); }
+      0%   { transform:scale(1.04); }
+      100% { transform:scale(1); }
     }
-
     .timer-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
+      font-size:11px; font-weight:600; letter-spacing:0.2em;
+      text-transform:uppercase; color:var(--text-muted);
     }
 
-    /* ─── Session Dots ─── */
-    .session-dots {
-      display: flex;
-      gap: 8px;
-    }
-
+    /* ── Session dots ── */
+    .session-dots { display:flex; gap:8px; }
     .session-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.15);
-      transition: all 0.4s ease;
+      width:10px; height:10px; border-radius:50%;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.15);
+      transition:all 0.4s ease;
     }
-
     .session-dot.done {
-      background: var(--focus-primary);
-      border-color: var(--focus-primary);
-      box-shadow: 0 0 10px var(--glow-focus);
+      background:var(--focus-primary); border-color:var(--focus-primary);
+      box-shadow:0 0 10px var(--glow-focus);
     }
 
-    /* ─── Inputs ─── */
-    .inputs-row {
-      display: flex;
-      gap: 14px;
-      width: 100%;
-    }
-
-    .input-group {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
+    /* ── Inputs grid ── */
+    .inputs-row { display:flex; gap:14px; width:100%; }
+    .input-group { flex:1; display:flex; flex-direction:column; gap:7px; }
     .input-group label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      padding-left: 2px;
+      font-size:11px; font-weight:600; letter-spacing:0.15em;
+      text-transform:uppercase; color:var(--text-muted); padding-left:2px;
     }
-
-    .input-wrap {
-      position: relative;
-    }
-
+    .input-wrap { position:relative; }
     .input-wrap input {
-      width: 100%;
-      padding: 12px 16px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--glass-border);
-      border-radius: 14px;
-      color: var(--text-primary);
-      font-family: 'Orbitron', monospace;
-      font-size: 18px;
-      font-weight: 700;
-      text-align: center;
-      outline: none;
-      transition: all 0.3s ease;
-      -moz-appearance: textfield;
+      width:100%; padding:12px 32px 12px 16px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+      border-radius:14px; color:var(--text-primary);
+      font-family:'Orbitron', monospace; font-size:18px; font-weight:700;
+      text-align:center; outline:none; transition:all 0.3s ease;
+      -moz-appearance:textfield;
     }
-
     .input-wrap input::-webkit-outer-spin-button,
-    .input-wrap input::-webkit-inner-spin-button { -webkit-appearance: none; }
-
+    .input-wrap input::-webkit-inner-spin-button { -webkit-appearance:none; }
     .input-wrap input:focus {
-      border-color: var(--focus-primary);
-      background: rgba(255,107,53,0.08);
-      box-shadow: 0 0 0 3px rgba(255,107,53,0.12);
+      border-color:#22c55e; background:rgba(34,197,94,0.08);
+      box-shadow:0 0 0 3px rgba(34,197,94,0.12);
     }
-
     .input-wrap .spin-btns {
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
+      position:absolute; right:8px; top:50%;
+      transform:translateY(-50%); display:flex; flex-direction:column; gap:2px;
     }
-
     .spin-btn {
-      width: 20px;
-      height: 18px;
-      background: rgba(255,255,255,0.06);
-      border: none;
-      border-radius: 5px;
-      color: var(--text-muted);
-      font-size: 10px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.2s;
-      line-height: 1;
+      width:20px; height:18px; background:rgba(255,255,255,0.06);
+      border:none; border-radius:5px; color:var(--text-muted);
+      font-size:10px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      transition:all 0.2s; line-height:1;
+    }
+    .spin-btn:hover { background:rgba(255,255,255,0.14); color:white; }
+
+    /* ── Turns row ── */
+    .turns-row {
+      display:flex; align-items:center; gap:14px; width:100%;
+      padding:14px 16px;
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:16px;
+    }
+    .turns-toggle-wrap { display:flex; flex-direction:column; gap:5px; flex:1; }
+    .turns-toggle-wrap label {
+      font-size:11px; font-weight:600; letter-spacing:0.15em;
+      text-transform:uppercase; color:var(--text-muted);
+    }
+    .toggle-row { display:flex; align-items:center; gap:10px; }
+    .toggle-switch {
+      position:relative; width:44px; height:24px; flex-shrink:0; cursor:pointer;
+    }
+    .toggle-switch input { opacity:0; width:0; height:0; }
+    .toggle-track {
+      position:absolute; inset:0; border-radius:12px;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.1);
+      transition:all 0.3s;
+    }
+    .toggle-switch input:checked + .toggle-track {
+      background:var(--focus-primary); border-color:var(--focus-primary);
+    }
+    .toggle-thumb {
+      position:absolute; top:3px; left:3px;
+      width:18px; height:18px; border-radius:50%;
+      background:white; box-shadow:0 1px 4px rgba(0,0,0,0.4);
+      transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+      pointer-events:none;
+    }
+    .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(20px); }
+    .toggle-label { font-size:14px; font-weight:600; color:var(--text-primary); }
+
+    .turns-input-wrap {
+      display:flex; flex-direction:column; gap:5px; min-width:90px;
+      transition:opacity 0.3s, filter 0.3s;
+    }
+    .turns-input-wrap.disabled { opacity:0.3; pointer-events:none; filter:grayscale(1); }
+    .turns-input-wrap label {
+      font-size:11px; font-weight:600; letter-spacing:0.15em;
+      text-transform:uppercase; color:var(--text-muted);
+    }
+    .turns-inner { position:relative; }
+    .turns-inner input {
+      width:100%; padding:10px 28px 10px 12px;
+      background:rgba(255,255,255,0.05); border:1px solid var(--glass-border);
+      border-radius:12px; color:var(--text-primary);
+      font-family:'Orbitron', monospace; font-size:16px; font-weight:700;
+      text-align:center; outline:none; transition:all 0.3s;
+      -moz-appearance:textfield;
+    }
+    .turns-inner input::-webkit-outer-spin-button,
+    .turns-inner input::-webkit-inner-spin-button { -webkit-appearance:none; }
+    .turns-inner input:focus {
+      border-color:#22c55e; background:rgba(34,197,94,0.08);
+      box-shadow:0 0 0 3px rgba(34,197,94,0.12);
+    }
+    .turns-inner .spin-btns {
+      position:absolute; right:6px; top:50%;
+      transform:translateY(-50%); display:flex; flex-direction:column; gap:2px;
     }
 
-    .spin-btn:hover {
-      background: rgba(255,255,255,0.14);
-      color: white;
-    }
-
-    /* ─── Buttons ─── */
-    .buttons-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      width: 100%;
-    }
-
+    /* ── Buttons ── */
+    .buttons-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; width:100%; }
     .btn {
-      position: relative;
-      padding: 15px;
-      border: none;
-      border-radius: 16px;
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      cursor: pointer;
-      overflow: hidden;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
+      position:relative; padding:15px; border:none; border-radius:16px;
+      font-family:'Rajdhani', sans-serif; font-size:15px; font-weight:700;
+      letter-spacing:0.1em; text-transform:uppercase; cursor:pointer;
+      overflow:hidden; transition:transform 0.2s ease, box-shadow 0.2s ease;
+      display:flex; align-items:center; justify-content:center; gap:8px;
     }
-
     .btn::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
-      opacity: 0;
-      transition: opacity 0.3s;
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+      opacity:0; transition:opacity 0.3s;
     }
-
-    .btn:hover::before { opacity: 1; }
-    .btn:hover { transform: translateY(-2px); }
-    .btn:active { transform: translateY(0) scale(0.97); }
+    .btn:hover::before { opacity:1; }
+    .btn:hover  { transform:translateY(-2px); }
+    .btn:active { transform:translateY(0) scale(0.97); }
 
     .btn-start {
-      background: linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
-      color: white;
-      box-shadow: 0 6px 24px rgba(255,107,53,0.35), 0 2px 6px rgba(0,0,0,0.3);
-      grid-column: 1 / -1;
+      background:linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
+      color:white; box-shadow:0 6px 24px rgba(34,197,94,0.35), 0 2px 6px rgba(0,0,0,0.3);
+      grid-column:1 / -1;
     }
-
     .btn-start.break-mode {
-      background: linear-gradient(135deg, var(--break-primary), var(--break-secondary));
-      box-shadow: 0 6px 24px rgba(6,214,160,0.35), 0 2px 6px rgba(0,0,0,0.3);
+      background:linear-gradient(135deg, var(--break-primary), var(--break-secondary));
+      box-shadow:0 6px 24px rgba(59,130,246,0.35), 0 2px 6px rgba(0,0,0,0.3);
     }
+    .btn-pause { background:rgba(245,158,11,0.15); border:1px solid rgba(245,158,11,0.35); color:#f59e0b; }
+    .btn-pause:hover { box-shadow:0 4px 16px rgba(245,158,11,0.25); }
+    .btn-reset { background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); color:#ef4444; }
+    .btn-reset:hover { box-shadow:0 4px 16px rgba(239,68,68,0.22); }
 
-    .btn-pause {
-      background: rgba(245,158,11,0.15);
-      border: 1px solid rgba(245,158,11,0.35);
-      color: #f59e0b;
-    }
-
-    .btn-pause:hover { box-shadow: 0 4px 16px rgba(245,158,11,0.25); }
-
-    .btn-reset {
-      background: rgba(239,68,68,0.12);
-      border: 1px solid rgba(239,68,68,0.3);
-      color: #ef4444;
-    }
-
-    .btn-reset:hover { box-shadow: 0 4px 16px rgba(239,68,68,0.22); }
-
-    /* ─── History ─── */
+    /* ── History ── */
     .history-card {
-      background: var(--bg-card);
-      border: 1px solid var(--glass-border);
-      border-radius: 22px;
-      padding: 22px;
-      backdrop-filter: blur(20px);
-      animation: fadeUp 0.8s 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+      background:var(--bg-card); border:1px solid var(--glass-border);
+      border-radius:22px; padding:22px; backdrop-filter:blur(20px);
+      animation:fadeUp 0.8s 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
     }
-
-    .history-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
+    .history-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
     .history-header h2 {
-      font-family: 'Orbitron', monospace;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--text-muted);
+      font-family:'Orbitron', monospace; font-size:13px; font-weight:700;
+      letter-spacing:0.2em; text-transform:uppercase; color:var(--text-muted);
     }
-
     .history-count {
-      background: rgba(255,107,53,0.15);
-      border: 1px solid rgba(255,107,53,0.25);
-      color: var(--focus-primary);
-      font-size: 12px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 50px;
+      background:rgba(34,197,94,0.15); border:1px solid rgba(34,197,94,0.25);
+      color:#22c55e; font-size:12px; font-weight:700;
+      padding:3px 10px; border-radius:50px;
     }
-
     .history-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      max-height: 220px;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      scrollbar-color: rgba(255,255,255,0.1) transparent;
+      display:flex; flex-direction:column; gap:8px;
+      max-height:220px; overflow-y:auto;
+      scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.1) transparent;
     }
-
     .history-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 500;
-      animation: slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
-      transition: background 0.2s;
+      display:flex; align-items:center; gap:12px;
+      padding:12px 14px;
+      background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05);
+      border-radius:12px; font-size:14px; font-weight:500;
+      animation:slideIn 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+      transition:background 0.2s;
     }
-
-    .history-item:hover { background: rgba(255,255,255,0.055); }
-
+    .history-item:hover { background:rgba(255,255,255,0.055); }
     @keyframes slideIn {
-      from { opacity: 0; transform: translateX(-16px); }
-      to   { opacity: 1; transform: translateX(0); }
+      from { opacity:0; transform:translateX(-16px); }
+      to   { opacity:1; transform:translateX(0); }
     }
-
     .history-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      background: linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
-      flex-shrink: 0;
+      width:32px; height:32px; border-radius:10px;
+      background:linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
+      display:flex; align-items:center; justify-content:center;
+      font-size:14px; flex-shrink:0;
     }
+    .history-info { flex:1; }
+    .history-title { font-weight:600; color:var(--text-primary); font-size:14px; }
+    .history-time  { font-size:12px; color:var(--text-muted); margin-top:1px; }
+    .history-empty { text-align:center; padding:24px; color:var(--text-muted); font-size:14px; }
 
-    .history-info { flex: 1; }
-    .history-title { font-weight: 600; color: var(--text-primary); font-size: 14px; }
-    .history-time { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-
-    .history-empty {
-      text-align: center;
-      padding: 24px;
-      color: var(--text-muted);
-      font-size: 14px;
-    }
-
-    /* ─── Completion Flash ─── */
+    /* ── Overlays ── */
     .flash-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(255,107,53,0.15);
-      pointer-events: none;
-      opacity: 0;
-      z-index: 100;
-      transition: opacity 0.1s;
+      position:fixed; inset:0; background:rgba(34,197,94,0.15);
+      pointer-events:none; opacity:0; z-index:100; transition:opacity 0.1s;
     }
-
-    .flash-overlay.break-mode { background: rgba(6,214,160,0.15); }
-    .flash-overlay.active { animation: flashAnim 0.7s ease forwards; }
-
+    .flash-overlay.break-mode { background:rgba(59,130,246,0.15); }
+    .flash-overlay.active { animation:flashAnim 0.8s ease forwards; }
     @keyframes flashAnim {
-      0%   { opacity: 0; }
-      20%  { opacity: 1; }
-      100% { opacity: 0; }
+      0%   { opacity:0; }
+      20%  { opacity:1; }
+      100% { opacity:0; }
     }
 
-    /* ─── Notification toast ─── */
+    /* ── Done overlay ── */
+    .done-overlay {
+      position:fixed; inset:0; background:rgba(5,8,16,0.85);
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+      gap:18px; z-index:300; opacity:0; pointer-events:none;
+      transition:opacity 0.5s;
+      backdrop-filter:blur(12px);
+    }
+    .done-overlay.show { opacity:1; pointer-events:all; }
+    .done-emoji { font-size:70px; animation:bounceIn 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+    @keyframes bounceIn {
+      from { transform:scale(0.2); opacity:0; }
+      to   { transform:scale(1); opacity:1; }
+    }
+    .done-title {
+      font-family:'Orbitron', monospace; font-size:26px; font-weight:900;
+      background:linear-gradient(135deg, var(--focus-primary), var(--focus-secondary));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+      letter-spacing:0.1em; text-align:center;
+    }
+    .done-sub { color:var(--text-muted); font-size:16px; font-weight:500; text-align:center; }
+    .done-btn {
+      margin-top:10px; padding:14px 36px;
+      background:linear-gradient(135deg, #22c55e, #86efac);
+      border:none; border-radius:16px; color:white;
+      font-family:'Rajdhani', sans-serif; font-size:17px; font-weight:700;
+      letter-spacing:0.12em; text-transform:uppercase; cursor:pointer;
+      box-shadow:0 8px 28px rgba(34,197,94,0.4);
+      transition:transform 0.2s;
+    }
+    .done-btn:hover { transform:scale(1.05); }
+
+    /* ── Toast ── */
     .toast {
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-80px);
-      background: rgba(20, 30, 50, 0.95);
-      border: 1px solid rgba(255,255,255,0.1);
-      backdrop-filter: blur(20px);
-      border-radius: 16px;
-      padding: 14px 24px;
-      font-size: 15px;
-      font-weight: 600;
-      color: white;
-      z-index: 200;
-      transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
-      white-space: nowrap;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      position:fixed; top:24px; left:50%;
+      transform:translateX(-50%) translateY(-80px);
+      background:rgba(20,30,50,0.95); border:1px solid rgba(255,255,255,0.1);
+      backdrop-filter:blur(20px); border-radius:16px;
+      padding:14px 24px; font-size:15px; font-weight:600; color:white;
+      z-index:200; transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1);
+      white-space:nowrap; box-shadow:0 8px 32px rgba(0,0,0,0.4);
+      display:flex; align-items:center; gap:10px;
     }
+    .toast.show { transform:translateX(-50%) translateY(0); }
 
-    .toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* ─── Responsive ─── */
-    @media (max-width: 440px) {
-      :root { --ring-size: 220px; }
-      .timer-digits { font-size: 48px; }
+    @media (max-width:440px) {
+      :root { --ring-size:220px; }
+      .timer-digits { font-size:48px; }
+      .inputs-row { flex-direction:column; }
+      .turns-row  { flex-direction:column; align-items:flex-start; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Particles -->
-  <div class="particles" id="particles"></div>
+<div class="particles" id="particles"></div>
+<div class="flash-overlay" id="flashOverlay"></div>
 
-  <!-- Flash Overlay -->
-  <div class="flash-overlay" id="flashOverlay"></div>
+<!-- All-done overlay -->
+<div class="done-overlay" id="doneOverlay">
+  <div class="done-emoji">🏆</div>
+  <div class="done-title">All Turns Complete!</div>
+  <div class="done-sub" id="doneSub">You smashed every session. Well done!</div>
+  <button class="done-btn" onclick="dismissDone()">Start Over</button>
+</div>
 
-  <!-- Toast -->
-  <div class="toast" id="toast">
-    <span id="toastIcon">🍅</span>
-    <span id="toastMsg">Focus session complete!</span>
-  </div>
+<!-- Toast -->
+<div class="toast" id="toast">
+  <span id="toastIcon">🍅</span>
+  <span id="toastMsg">Ready!</span>
+</div>
 
-  <!-- App -->
-  <div class="app">
-    <!-- Header -->
-    <div class="header">
-      <h1 id="appTitle">Pomodoro</h1>
-      <div>
-        <span class="mode-badge" id="modeBadge">
-          <span class="dot"></span>
-          <span id="modeText">Focus Time</span>
-        </span>
-      </div>
+<div class="app">
+  <!-- Header -->
+  <div class="header">
+    <h1 id="appTitle">Pomodoro</h1>
+    <div>
+      <span class="mode-badge" id="modeBadge">
+        <span class="dot"></span>
+        <span id="modeText">Focus Time</span>
+      </span>
     </div>
-
-    <!-- Timer Card -->
-    <div class="timer-card focus-glow" id="timerCard">
-      <!-- SVG Ring -->
-      <div class="ring-wrap" id="ringWrap">
-        <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <linearGradient id="focusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#ff6b35"/>
-              <stop offset="100%" stop-color="#ff9f1c"/>
-            </linearGradient>
-            <linearGradient id="breakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#06d6a0"/>
-              <stop offset="100%" stop-color="#0cb8e0"/>
-            </linearGradient>
-          </defs>
-          <circle class="ring-track" cx="130" cy="130" r="120"/>
-          <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="120"/>
-        </svg>
-        <div class="timer-center">
-          <div class="timer-digits" id="timerDigits">25:00</div>
-          <div class="timer-label" id="timerLabel">remaining</div>
-        </div>
-      </div>
-
-      <!-- Session Dots -->
-      <div class="session-dots" id="sessionDots">
-        <div class="session-dot"></div>
-        <div class="session-dot"></div>
-        <div class="session-dot"></div>
-        <div class="session-dot"></div>
-      </div>
-
-      <!-- Inputs -->
-      <div class="inputs-row">
-        <div class="input-group">
-          <label>Focus (min)</label>
-          <div class="input-wrap">
-            <input type="number" id="focusInput" min="1" max="60" value="25" />
-            <div class="spin-btns">
-              <button class="spin-btn" onclick="nudge('focus', 1)">▲</button>
-              <button class="spin-btn" onclick="nudge('focus', -1)">▼</button>
-            </div>
-          </div>
-        </div>
-        <div class="input-group">
-          <label>Break (min)</label>
-          <div class="input-wrap">
-            <input type="number" id="breakInput" min="1" max="30" value="5" />
-            <div class="spin-btns">
-              <button class="spin-btn" onclick="nudge('break', 1)">▲</button>
-              <button class="spin-btn" onclick="nudge('break', -1)">▼</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Buttons -->
-      <div class="buttons-grid">
-        <button class="btn btn-start" id="startBtn" onclick="handleStart()">
-          <span id="startIcon">▶</span>
-          <span id="startLabel">Start Focus</span>
-        </button>
-        <button class="btn btn-pause" id="pauseBtn" onclick="pauseTimer()">⏸ Pause</button>
-        <button class="btn btn-reset" onclick="resetTimer()">↺ Reset</button>
-      </div>
-    </div>
-
-    <!-- History -->
-    <div class="history-card">
-      <div class="history-header">
-        <h2>Today's Sessions</h2>
-        <span class="history-count" id="historyCount">0 done</span>
-      </div>
-      <div class="history-list" id="historyList">
-        <div class="history-empty">No sessions yet — start focusing! 🍅</div>
-      </div>
+    <!-- Turns left banner -->
+    <div class="turns-banner" id="turnsBanner">
+      <span class="turns-left-num" id="turnsLeftNum">4</span>
+      <span class="turns-left-label">turns left</span>
     </div>
   </div>
+
+  <!-- Timer Card -->
+  <div class="timer-card focus-glow" id="timerCard">
+    <!-- Ring -->
+    <div class="ring-wrap" id="ringWrap">
+      <svg viewBox="0 0 260 260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="focusGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#22c55e"/>
+            <stop offset="100%" stop-color="#86efac"/>
+          </linearGradient>
+          <linearGradient id="breakGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#93c5fd"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="130" cy="130" r="120"/>
+        <circle class="ring-progress" id="ringProgress" cx="130" cy="130" r="120"/>
+      </svg>
+      <div class="timer-center">
+        <div class="timer-digits" id="timerDigits">25:00</div>
+        <div class="timer-label" id="timerLabel">remaining</div>
+      </div>
+    </div>
+
+    <!-- Session dots -->
+    <div class="session-dots" id="sessionDots">
+      <div class="session-dot"></div>
+      <div class="session-dot"></div>
+      <div class="session-dot"></div>
+      <div class="session-dot"></div>
+    </div>
+
+    <!-- Focus / Break inputs -->
+    <div class="inputs-row">
+      <div class="input-group">
+        <label>Focus (min)</label>
+        <div class="input-wrap">
+          <input type="number" id="focusInput" min="1" max="60" value="25"/>
+          <div class="spin-btns">
+            <button class="spin-btn" onclick="nudge('focus',1)">▲</button>
+            <button class="spin-btn" onclick="nudge('focus',-1)">▼</button>
+          </div>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>Break (min)</label>
+        <div class="input-wrap">
+          <input type="number" id="breakInput" min="1" max="30" value="5"/>
+          <div class="spin-btns">
+            <button class="spin-btn" onclick="nudge('break',1)">▲</button>
+            <button class="spin-btn" onclick="nudge('break',-1)">▼</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Turns row -->
+    <div class="turns-row">
+      <div class="turns-toggle-wrap">
+        <label>Mode</label>
+        <div class="toggle-row">
+          <label class="toggle-switch">
+            <input type="checkbox" id="infiniteToggle" checked onchange="onInfiniteToggle()"/>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+          <span class="toggle-label" id="toggleLabel">Infinite ∞</span>
+        </div>
+      </div>
+      <div class="turns-input-wrap disabled" id="turnsInputWrap">
+        <label>Turns</label>
+        <div class="turns-inner">
+          <input type="number" id="turnsInput" min="1" max="20" value="4"/>
+          <div class="spin-btns">
+            <button class="spin-btn" onclick="nudge('turns',1)">▲</button>
+            <button class="spin-btn" onclick="nudge('turns',-1)">▼</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons-grid">
+      <button class="btn btn-start" id="startBtn">
+        <span id="startIcon">▶</span>
+        <span id="startLabel">Start Focus</span>
+      </button>
+      <button class="btn btn-pause" onclick="pauseTimer()">⏸ Pause</button>
+      <button class="btn btn-reset" onclick="resetTimer()">↺ Reset</button>
+    </div>
+  </div>
+
+  <!-- History -->
+  <div class="history-card">
+    <div class="history-header">
+      <h2>Today's Sessions</h2>
+      <span class="history-count" id="historyCount">0 done</span>
+    </div>
+    <div class="history-list" id="historyList">
+      <div class="history-empty">No sessions yet — start focusing! 🍅</div>
+    </div>
+  </div>
+</div>
 
 <script>
-  // ─── Particles ───
-  const particlesEl = document.getElementById('particles');
-  const COLORS_FOCUS = ['#ff6b35','#ff9f1c','#ffcc70'];
-  const COLORS_BREAK = ['#06d6a0','#0cb8e0','#7be8ff'];
-  let particleColors = COLORS_FOCUS;
 
-  function createParticle() {
-    const p = document.createElement('div');
-    p.classList.add('particle');
-    const size = Math.random() * 4 + 2;
-    const color = particleColors[Math.floor(Math.random() * particleColors.length)];
-    p.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      bottom:-10px;
-      background:${color};
-      box-shadow: 0 0 ${size*2}px ${color};
-      animation-duration:${Math.random()*12+8}s;
-      animation-delay:${Math.random()*5}s;
-    `;
-    particlesEl.appendChild(p);
-    setTimeout(() => p.remove(), 20000);
+//  AUDIO ENGINE 
+
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playTone(frequency, type, duration, volume, delay = 0) {
+  const ctx = getAudioCtx();
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(frequency, ctx.currentTime + delay);
+  gain.gain.setValueAtTime(0, ctx.currentTime + delay);
+  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + delay + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay + duration);
+  osc.start(ctx.currentTime + delay);
+  osc.stop(ctx.currentTime + delay + duration + 0.05);
+}
+
+// Focus complete sound — three ascending bell notes
+function playFocusComplete() {
+  playTone(523, 'sine', 0.6, 0.5, 0.0);   // C5
+  playTone(659, 'sine', 0.6, 0.5, 0.25);  // E5
+  playTone(784, 'sine', 0.9, 0.5, 0.5);   // G5 (held)
+  // subtle shimmer
+  playTone(1568,'sine', 0.4, 0.15, 0.55);
+}
+
+// Break complete sound — two gentle descending tones, warmer
+function playBreakComplete() {
+  playTone(880, 'sine', 0.5, 0.45, 0.0);  // A5
+  playTone(698, 'sine', 0.5, 0.45, 0.3);  // F5
+  playTone(523, 'sine', 0.8, 0.45, 0.6);  // C5 (resolve)
+}
+
+// Done sound — fanfare
+function playAllDone() {
+  [523,659,784,1047].forEach((f,i) => playTone(f,'sine',0.7,0.5, i*0.18));
+}
+
+
+//  PARTICLES
+
+const particlesEl = document.getElementById('particles');
+const COLORS_FOCUS = ['#22c55e','#86efac','#4ade80'];
+const COLORS_BREAK = ['#3b82f6','#93c5fd','#60a5fa'];
+let particleColors = COLORS_FOCUS;
+
+function createParticle() {
+  const p = document.createElement('div');
+  p.classList.add('particle');
+  const size = Math.random() * 4 + 2;
+  const color = particleColors[Math.floor(Math.random() * particleColors.length)];
+  p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:-10px;
+    background:${color};box-shadow:0 0 ${size*2}px ${color};
+    animation-duration:${Math.random()*12+8}s;animation-delay:${Math.random()*5}s;`;
+  particlesEl.appendChild(p);
+  setTimeout(() => p.remove(), 20000);
+}
+setInterval(createParticle, 600);
+
+
+//  STATE
+
+const CIRCUMFERENCE = 2 * Math.PI * 120; // ≈754
+
+let timeLeft    = 0;
+let totalTime   = 0;
+let ticker      = null;
+let isRunning   = false;
+let isPaused    = false;
+let isFocusMode = true;
+let sessionsToday = 0;
+
+// Turns
+let isInfinite   = true;
+let turnsTotal   = 4;   // user-set
+let turnsLeft    = 4;   // countdown
+
+
+//  ELEMENT REFS
+
+const timerDigits  = document.getElementById('timerDigits');
+const timerLabel   = document.getElementById('timerLabel');
+const ringProgress = document.getElementById('ringProgress');
+const modeBadge    = document.getElementById('modeBadge');
+const modeText     = document.getElementById('modeText');
+const appTitle     = document.getElementById('appTitle');
+const timerCard    = document.getElementById('timerCard');
+const ringWrap     = document.getElementById('ringWrap');
+const startBtn     = document.getElementById('startBtn');
+const startLabel   = document.getElementById('startLabel');
+const startIcon    = document.getElementById('startIcon');
+const focusInput   = document.getElementById('focusInput');
+const breakInput   = document.getElementById('breakInput');
+const turnsInput   = document.getElementById('turnsInput');
+const turnsInputWrap = document.getElementById('turnsInputWrap');
+const infiniteToggle = document.getElementById('infiniteToggle');
+const toggleLabel  = document.getElementById('toggleLabel');
+const turnsBanner  = document.getElementById('turnsBanner');
+const turnsLeftNum = document.getElementById('turnsLeftNum');
+const historyList  = document.getElementById('historyList');
+const historyCount = document.getElementById('historyCount');
+const sessionDots  = document.getElementById('sessionDots');
+const flashOverlay = document.getElementById('flashOverlay');
+const doneOverlay  = document.getElementById('doneOverlay');
+const doneSub      = document.getElementById('doneSub');
+const toast        = document.getElementById('toast');
+const toastMsg     = document.getElementById('toastMsg');
+const toastIcon    = document.getElementById('toastIcon');
+
+ringProgress.style.strokeDasharray = CIRCUMFERENCE;
+
+
+//  LOCAL STORAGE
+
+const todayStr = new Date().toDateString();
+if (localStorage.getItem('pom-date') !== todayStr) {
+  localStorage.removeItem('pom-history');
+  localStorage.setItem('pom-date', todayStr);
+}
+function loadHistory()    { return JSON.parse(localStorage.getItem('pom-history') || '[]'); }
+function saveToHistory(i) { const h = loadHistory(); h.unshift(i); localStorage.setItem('pom-history', JSON.stringify(h)); }
+
+
+//  NUDGE INPUTS
+
+function nudge(type, dir) {
+  if (type === 'focus') {
+    const el = focusInput;
+    el.value = Math.min(60, Math.max(1, parseInt(el.value||25) + dir));
+    if (!isRunning && isFocusMode) { timeLeft = el.value * 60; totalTime = timeLeft; updateDisplay(); }
+  } else if (type === 'break') {
+    const el = breakInput;
+    el.value = Math.min(30, Math.max(1, parseInt(el.value||5) + dir));
+    if (!isRunning && !isFocusMode) { timeLeft = el.value * 60; totalTime = timeLeft; updateDisplay(); }
+  } else if (type === 'turns') {
+    const el = turnsInput;
+    el.value = Math.min(20, Math.max(1, parseInt(el.value||4) + dir));
   }
+}
 
-  setInterval(createParticle, 600);
 
-  // ─── State ───
-  const CIRCUMFERENCE = 2 * Math.PI * 120; // ~754
-  let timeLeft = 0;
-  let totalTime = 0;
-  let timer = null;
-  let isRunning = false;
-  let isPaused = false;
-  let isFocusMode = true;
-  let sessionsToday = 0;
+//  INFINITE TOGGLE
 
-  // ─── Elements ───
-  const timerDigits = document.getElementById('timerDigits');
-  const timerLabel  = document.getElementById('timerLabel');
-  const ringProgress = document.getElementById('ringProgress');
-  const modeBadge   = document.getElementById('modeBadge');
-  const modeText    = document.getElementById('modeText');
-  const appTitle    = document.getElementById('appTitle');
-  const timerCard   = document.getElementById('timerCard');
-  const ringWrap    = document.getElementById('ringWrap');
-  const startBtn    = document.getElementById('startBtn');
-  const startLabel  = document.getElementById('startLabel');
-  const startIcon   = document.getElementById('startIcon');
-  const focusInput  = document.getElementById('focusInput');
-  const breakInput  = document.getElementById('breakInput');
-  const historyList = document.getElementById('historyList');
-  const historyCount = document.getElementById('historyCount');
-  const sessionDots = document.getElementById('sessionDots');
-  const flashOverlay = document.getElementById('flashOverlay');
-  const toast       = document.getElementById('toast');
-  const toastMsg    = document.getElementById('toastMsg');
-  const toastIcon   = document.getElementById('toastIcon');
+function onInfiniteToggle() {
+  isInfinite = infiniteToggle.checked;
+  toggleLabel.textContent = isInfinite ? 'Infinite ∞' : 'Fixed turns';
+  turnsInputWrap.classList.toggle('disabled', isInfinite);
+  updateTurnsBanner();
+}
 
-  ringProgress.style.strokeDasharray = CIRCUMFERENCE;
-
-  // ─── Storage ───
-  const todayStr = new Date().toDateString();
-  if (localStorage.getItem('pom-date') !== todayStr) {
-    localStorage.removeItem('pom-history');
-    localStorage.setItem('pom-date', todayStr);
+function updateTurnsBanner() {
+  if (isInfinite || !isRunning) {
+    turnsBanner.classList.remove('visible');
+  } else {
+    turnsBanner.classList.add('visible');
+    turnsLeftNum.textContent = turnsLeft;
+    turnsLeftNum.className = isFocusMode ? 'turns-left-num' : 'turns-left-num break-mode';
   }
+}
 
-  function loadHistory() { return JSON.parse(localStorage.getItem('pom-history') || '[]'); }
-  function saveToHistory(item) {
-    const h = loadHistory();
-    h.unshift(item);
-    localStorage.setItem('pom-history', JSON.stringify(h));
+
+//  FORMAT
+
+function fmt(s) {
+  const m = Math.floor(s/60), sec = s%60;
+  return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+}
+
+
+//  DISPLAY
+
+function updateDisplay() {
+  timerDigits.textContent = fmt(timeLeft);
+  const ratio = totalTime > 0 ? timeLeft / totalTime : 1;
+  ringProgress.style.strokeDashoffset = CIRCUMFERENCE * (1 - ratio);
+}
+
+
+//  THEME
+
+function setTheme(focusMode) {
+  isFocusMode = focusMode;
+  particleColors = focusMode ? COLORS_FOCUS : COLORS_BREAK;
+
+  appTitle.className     = focusMode ? '' : 'break-mode';
+  modeBadge.className    = focusMode ? 'mode-badge' : 'mode-badge break-mode';
+  modeText.textContent   = focusMode ? 'Focus Time' : 'Break Time';
+  timerCard.className    = focusMode ? 'timer-card focus-glow' : 'timer-card break-glow';
+  timerCard.classList.toggle('break-mode', !focusMode);
+  ringWrap.className     = focusMode ? 'ring-wrap' : 'ring-wrap break-mode';
+  timerDigits.className  = focusMode ? 'timer-digits' : 'timer-digits break-mode';
+  ringProgress.className = focusMode ? 'ring-progress' : 'ring-progress break-mode';
+  startBtn.className     = focusMode ? 'btn btn-start' : 'btn btn-start break-mode';
+  flashOverlay.className = focusMode ? 'flash-overlay' : 'flash-overlay break-mode';
+  timerLabel.textContent = focusMode ? 'remaining' : 'break left';
+}
+
+
+//  TOAST
+
+let toastTimeout;
+function showToast(msg, icon='🍅') {
+  toastMsg.textContent = msg;
+  toastIcon.textContent = icon;
+  toast.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => toast.classList.remove('show'), 3800);
+}
+
+
+//  FLASH
+
+function triggerFlash() {
+  flashOverlay.classList.add('active');
+  setTimeout(() => flashOverlay.classList.remove('active'), 900);
+}
+
+
+//  SESSION DOTS
+
+function updateDots() {
+  const dots = sessionDots.querySelectorAll('.session-dot');
+  dots.forEach((d,i) => d.classList.toggle('done', i < (sessionsToday % 4)));
+}
+
+
+//  RENDER HISTORY
+
+function renderHistory() {
+  const h = loadHistory();
+  historyCount.textContent = `${h.length} done`;
+  if (h.length === 0) {
+    historyList.innerHTML = '<div class="history-empty">No sessions yet — start focusing! 🍅</div>';
+    return;
   }
+  historyList.innerHTML = '';
+  h.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'history-item';
+    el.innerHTML = `
+      <div class="history-icon">🍅</div>
+      <div class="history-info">
+        <div class="history-title">${item.duration} focus session</div>
+        <div class="history-time">${item.time}</div>
+      </div>`;
+    historyList.appendChild(el);
+  });
+}
 
-  // ─── Nudge inputs ───
-  function nudge(type, dir) {
-    const el = type === 'focus' ? focusInput : breakInput;
-    const min = parseInt(el.min), max = parseInt(el.max);
-    el.value = Math.min(max, Math.max(min, parseInt(el.value) + dir));
-    if (!isRunning) { timeLeft = parseInt(el.value) * 60; updateDisplay(); }
+
+//  TICK
+
+function tick() {
+  if (timeLeft > 0) {
+    timeLeft--;
+    updateDisplay();
+    timerDigits.classList.remove('tick');
+    void timerDigits.offsetWidth;
+    timerDigits.classList.add('tick');
+  } else {
+    onSessionEnd();
   }
+}
 
-  // ─── Format ───
-  function fmt(s) {
-    const m = Math.floor(s/60), sec = s%60;
-    return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
-  }
 
-  // ─── Display ───
-  function updateDisplay() {
-    timerDigits.textContent = fmt(timeLeft);
-    const ratio = totalTime > 0 ? (1 - timeLeft / totalTime) : 0;
-    const offset = CIRCUMFERENCE * (1 - (1 - ratio)); // progress = ratio covered
-    ringProgress.style.strokeDashoffset = CIRCUMFERENCE - (CIRCUMFERENCE * (1 - ratio));
-  }
+//  SESSION END → AUTO-CYCLE
 
-  // ─── Theme ───
-  function setTheme(focusMode) {
-    isFocusMode = focusMode;
-    particleColors = focusMode ? COLORS_FOCUS : COLORS_BREAK;
+function onSessionEnd() {
+  clearInterval(ticker);
+  ticker = null;
+  isRunning = false;
+  isPaused  = false;
+  triggerFlash();
 
-    appTitle.className     = focusMode ? '' : 'break-mode';
-    modeBadge.className    = focusMode ? 'mode-badge' : 'mode-badge break-mode';
-    modeText.textContent   = focusMode ? 'Focus Time' : 'Break Time';
-    timerCard.className    = focusMode ? 'timer-card focus-glow' : 'timer-card break-glow';
-    timerCard.classList.toggle('break-mode', !focusMode);
-    ringWrap.className     = focusMode ? 'ring-wrap' : 'ring-wrap break-mode';
-    timerDigits.className  = focusMode ? 'timer-digits' : 'timer-digits break-mode';
-    ringProgress.className = focusMode ? 'ring-progress' : 'ring-progress break-mode';
-    startBtn.className     = focusMode ? 'btn btn-start' : 'btn btn-start break-mode';
-    startLabel.textContent = focusMode ? 'Start Focus' : 'Start Break';
-    flashOverlay.className = focusMode ? 'flash-overlay' : 'flash-overlay break-mode';
-    timerLabel.textContent = focusMode ? 'remaining' : 'break left';
-  }
-
-  // ─── Toast ───
-  let toastTimeout;
-  function showToast(msg, icon='🍅') {
-    toastMsg.textContent = msg;
-    toastIcon.textContent = icon;
-    toast.classList.add('show');
-    clearTimeout(toastTimeout);
-    toastTimeout = setTimeout(() => toast.classList.remove('show'), 3500);
-  }
-
-  // ─── Flash ───
-  function triggerFlash() {
-    flashOverlay.classList.add('active');
-    setTimeout(() => flashOverlay.classList.remove('active'), 800);
-  }
-
-  // ─── Session dots ───
-  function updateDots() {
-    const dots = sessionDots.querySelectorAll('.session-dot');
-    dots.forEach((d, i) => d.classList.toggle('done', i < (sessionsToday % 4)));
-  }
-
-  // ─── Render History ───
-  function renderHistory() {
-    const h = loadHistory();
-    historyCount.textContent = `${h.length} done`;
-    if (h.length === 0) {
-      historyList.innerHTML = '<div class="history-empty">No sessions yet — start focusing! 🍅</div>';
-      return;
-    }
-    historyList.innerHTML = '';
-    h.forEach(item => {
-      const el = document.createElement('div');
-      el.className = 'history-item';
-      el.innerHTML = `
-        <div class="history-icon">🍅</div>
-        <div class="history-info">
-          <div class="history-title">${item.duration} focus session</div>
-          <div class="history-time">${item.time}</div>
-        </div>
-      `;
-      historyList.appendChild(el);
+  if (isFocusMode) {
+    // Focus just finished → play focus-done sound → auto-start break
+    playFocusComplete();
+    sessionsToday++;
+    saveToHistory({
+      duration: fmt(parseInt(focusInput.value)*60),
+      time: new Date().toLocaleTimeString([], { hour:'numeric', minute:'2-digit' })
     });
-  }
+    renderHistory();
+    updateDots();
 
-  renderHistory();
-  sessionsToday = loadHistory().length;
-  updateDots();
-
-  // ─── Timer Core ───
-  function tick() {
-    if (timeLeft > 0) {
-      timeLeft--;
-      updateDisplay();
-      // small tick animation every second
-      timerDigits.classList.remove('tick');
-      void timerDigits.offsetWidth;
-      timerDigits.classList.add('tick');
-    } else {
-      onSessionEnd();
+    if (!isInfinite) {
+      turnsLeft--;
+      if (turnsLeft <= 0) {
+        // All done!
+        playAllDone();
+        doneSub.textContent = `You completed ${turnsTotal} full turn${turnsTotal>1?'s':''}. Amazing work!`;
+        doneOverlay.classList.add('show');
+        setTheme(true);
+        updateTurnsBanner();
+        return;
+      }
     }
-  }
 
-  function onSessionEnd() {
-    clearInterval(timer);
-    isRunning = false;
-    isPaused = false;
-    triggerFlash();
-
-    if (isFocusMode) {
-      sessionsToday++;
-      saveToHistory({ duration: fmt(parseInt(focusInput.value)*60), time: new Date().toLocaleTimeString([], { hour:'numeric', minute:'2-digit' }) });
-      renderHistory();
-      updateDots();
-      showToast('Focus complete! Time to recharge ☕', '✅');
-      setTheme(false);
-      timeLeft = parseInt(breakInput.value) * 60;
-    } else {
-      showToast('Break over! Back to work 💪', '🍅');
-      setTheme(true);
-      timeLeft = parseInt(focusInput.value) * 60;
-    }
+    showToast('Focus done! Break starting 🌿', '✅');
+    setTheme(false);
+    timeLeft  = parseInt(breakInput.value) * 60;
     totalTime = timeLeft;
     updateDisplay();
-  }
+    updateTurnsBanner();
+    // auto-start break
+    autoStart();
 
-  function handleStart() {
-    if (isRunning) return;
-    if (!isPaused) {
-      timeLeft = isFocusMode
-        ? parseInt(focusInput.value) * 60
-        : parseInt(breakInput.value) * 60;
-      totalTime = timeLeft;
-    }
-    isRunning = true;
-    isPaused  = false;
-    startLabel.textContent = isFocusMode ? 'Focusing...' : 'On break...';
-    startIcon.textContent  = '●';
-    timer = setInterval(tick, 1000);
-    updateDisplay();
-  }
-
-  function pauseTimer() {
-    if (!isRunning) return;
-    clearInterval(timer);
-    isRunning = false;
-    isPaused  = true;
-    startLabel.textContent = 'Resume';
-    startIcon.textContent  = '▶';
-  }
-
-  function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    isPaused  = false;
+  } else {
+    // Break just finished → play break-done sound → auto-start focus
+    playBreakComplete();
+    showToast('Break over! Focus starting 🔥', '🍅');
     setTheme(true);
     timeLeft  = parseInt(focusInput.value) * 60;
     totalTime = timeLeft;
-    startLabel.textContent = 'Start Focus';
-    startIcon.textContent  = '▶';
     updateDisplay();
+    updateTurnsBanner();
+    // auto-start focus
+    autoStart();
+  }
+}
+
+function autoStart() {
+  isRunning = true;
+  isPaused  = false;
+  startIcon.textContent  = '●';
+  startLabel.textContent = isFocusMode ? 'Focusing...' : 'On break...';
+  ticker = setInterval(tick, 1000);
+}
+
+
+//  CONTROLS
+
+startBtn.addEventListener('click', () => {
+  getAudioCtx(); // unlock audio on first user gesture
+
+  if (isRunning) return;
+
+  if (isPaused) {
+    isRunning = true;
+    isPaused  = false;
+    startIcon.textContent  = '●';
+    startLabel.textContent = isFocusMode ? 'Focusing...' : 'On break...';
+    ticker = setInterval(tick, 1000);
+    return;
   }
 
-  // Start/Resume logic
-  startBtn.addEventListener('click', () => {
-    if (isPaused) {
-      // resume
-      isRunning = true;
-      isPaused  = false;
-      startLabel.textContent = isFocusMode ? 'Focusing...' : 'On break...';
-      startIcon.textContent  = '●';
-      timer = setInterval(tick, 1000);
-    } else {
-      handleStart();
-    }
-  });
+  // Fresh start
+  if (!isInfinite) {
+    turnsTotal = Math.max(1, parseInt(turnsInput.value) || 4);
+    turnsLeft  = turnsTotal;
+  }
 
-  focusInput.addEventListener('change', () => {
-    if (!isRunning && !isPaused && isFocusMode) {
-      timeLeft = parseInt(focusInput.value) * 60;
-      totalTime = timeLeft;
-      updateDisplay();
-    }
-  });
-
-  breakInput.addEventListener('change', () => {
-    if (!isRunning && !isPaused && !isFocusMode) {
-      timeLeft = parseInt(breakInput.value) * 60;
-      totalTime = timeLeft;
-      updateDisplay();
-    }
-  });
-
-  // Init
-  timeLeft = parseInt(focusInput.value) * 60;
+  setTheme(true);
+  timeLeft  = parseInt(focusInput.value) * 60;
   totalTime = timeLeft;
-  ringProgress.style.strokeDashoffset = 0; // empty ring at start
   updateDisplay();
+  updateTurnsBanner();
+
+  startIcon.textContent  = '●';
+  startLabel.textContent = 'Focusing...';
+  isRunning = true;
+  isPaused  = false;
+  ticker = setInterval(tick, 1000);
+});
+
+function pauseTimer() {
+  if (!isRunning) return;
+  clearInterval(ticker);
+  ticker    = null;
+  isRunning = false;
+  isPaused  = true;
+  startIcon.textContent  = '▶';
+  startLabel.textContent = 'Resume';
+}
+
+function resetTimer() {
+  clearInterval(ticker);
+  ticker    = null;
+  isRunning = false;
+  isPaused  = false;
+  setTheme(true);
+  turnsLeft  = isInfinite ? 0 : parseInt(turnsInput.value) || 4;
+  turnsTotal = turnsLeft;
+  timeLeft   = parseInt(focusInput.value) * 60;
+  totalTime  = timeLeft;
+  startIcon.textContent  = '▶';
+  startLabel.textContent = 'Start Focus';
+  turnsBanner.classList.remove('visible');
+  updateDisplay();
+}
+
+function dismissDone() {
+  doneOverlay.classList.remove('show');
+  resetTimer();
+}
+
+// Input listeners
+focusInput.addEventListener('change', () => {
+  if (!isRunning && !isPaused && isFocusMode) {
+    timeLeft = parseInt(focusInput.value)*60; totalTime = timeLeft; updateDisplay();
+  }
+});
+breakInput.addEventListener('change', () => {
+  if (!isRunning && !isPaused && !isFocusMode) {
+    timeLeft = parseInt(breakInput.value)*60; totalTime = timeLeft; updateDisplay();
+  }
+});
+
+
+//  INIT
+
+renderHistory();
+sessionsToday = loadHistory().length;
+updateDots();
+timeLeft  = parseInt(focusInput.value) * 60;
+totalTime = timeLeft;
+ringProgress.style.strokeDashoffset = 0;
+updateDisplay();
 </script>
 </body>
 </html>
